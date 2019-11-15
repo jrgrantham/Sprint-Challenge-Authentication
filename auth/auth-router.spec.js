@@ -23,10 +23,10 @@ beforeEach(async () => {
 describe('auth-router', () => {
   describe('register endpoint', () => {
     it('should return 200', async () => {
-      const response = await request(server)
+      const res = await request(server)
         .post(registerApi)
         .send(exampleUser)
-      expect(response.status).toBe(200)
+      expect(res.status).toBe(200)
     })
     it('should have a body', async () => {
       const response = await request(server)
@@ -38,15 +38,13 @@ describe('auth-router', () => {
       // console.log(response.body)
       expect(response.body.username).toEqual('Tony')
     })
-    // it('should not allow duplicates', async () => {
-    //   await request(server)
-    //     .post(registerApi)
-    //     .send(exampleUser)
-    //   const response = await request(server)
-    //     .post(registerApi)
-    //     .send(exampleUser)
-    //   expect(response.status).toBe(401)
-    // })
+    it('should not allow duplicates', async () => {
+      const response = await request(server)
+        .post(registerApi)
+        .send(exampleUser)
+        console.log(response.res.text);
+        expect(response.res.text).toContain('SQLITE_CONSTRAINT')
+    })
   })
 
   describe('login endpoint', () => {
@@ -81,18 +79,19 @@ describe('jokes api', () => {
       .post(loginApi)
       .send(exampleUser)
     let token = loginResponse.body.token
-    console.log(token)
+    // console.log(token)
     const jokesResponse = await request(server)
       .get(jokesApi)
       .set({ Authorization: token })
-    console.log(jokesResponse.status)
+    // console.log(jokesResponse.status)
     expect(jokesResponse.status).toBe(200)
   })
   it("shouldn't return jokes", async () => {
     const jokesResponse = await request(server)
       .get(jokesApi)
       .set({ Authorization: 'incorrectToken' })
-    console.log(jokesResponse.status)
+    // console.log(jokesResponse.status)
     expect(jokesResponse.status).toBe(401)
   })
 })
+
